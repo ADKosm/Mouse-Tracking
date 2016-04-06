@@ -16,11 +16,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         base.cpp \
-    test1.cpp
+    test1.cpp \
+    graphicsbuttons.cpp \
+    serializator.cpp
 
 HEADERS  += base.h \
     test1.h \
     ITest.h \
-    tests.h
+    tests.h \
+    graphicsbuttons.h \
+    serializator.h
 
 FORMS    += base.ui

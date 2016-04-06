@@ -8,23 +8,30 @@ class TestGraphicsScene1 : public QGraphicsScene {
 public:
     explicit TestGraphicsScene1(QObject *parent = 0);
     ~TestGraphicsScene1();
+
+    void setObjects();
 private:
     int screenWidth;
     int screenHeight;
     int ballSize;
     QColor targetBallColor;
     bool recording;
-    QGraphicsRectItem * startButton;
+    startButton * sButton;
     QGraphicsEllipseItem * targetBall;
+    QGraphicsTextItem * escText;
+    QTime time;
 
-    QVector<QPointF> recordData;
+    QVector< QPair<QPointF, int> > recordData;
 
     void startRecord();
     void stopRecord();
     void storeData();
+
+    QRect getAvailableGeometry(QGraphicsScene * scene);
 private slots:
     void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);
     void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 class Test1: public ITest {

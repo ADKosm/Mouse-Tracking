@@ -1,6 +1,8 @@
 #ifndef ITEST_H
 #define ITEST_H
 
+#include "graphicsbuttons.h"
+#include "serializator.h"
 #include <QApplication>
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -12,6 +14,9 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
+#include <QPair>
+#include <QTime>
+#include <QKeyEvent>
 
 class ITest {
 public:
