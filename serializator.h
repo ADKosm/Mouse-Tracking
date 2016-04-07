@@ -18,6 +18,7 @@ public:
     serializator * add(QString attr, int val, bool final = false);
     serializator * add(QString attr, QString val, bool final = false);
     serializator * add(QString attr, QVector< QPair<QPointF, int> > &val, bool final = false);
+    serializator * add(QString attr, QVector<QPointF> val, bool final = false);
     void end();
 };
 

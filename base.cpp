@@ -11,8 +11,7 @@ base::base(QWidget *parent) :
     mapper = new QSignalMapper(this);
 
     tests.push_back(new Test1());
-    tests.push_back(new Test1());
-    tests.push_back(new Test1());
+    tests.push_back(new Test2());
 
     for(int i = 0; i < tests.size(); i++) {
         QPushButton * button = new QPushButton(QString("Test %1").arg(QString::number(i+1)));

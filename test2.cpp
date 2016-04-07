@@ -1,12 +1,12 @@
-#include "test1.h"
+#include "test2.h"
 #include <QMessageBox>
 
-Test1::Test1() {}
+Test2::Test2() {}
 
-Test1::~Test1() {}
+Test2::~Test2() {}
 
-void Test1::run() {
-    scene = new TestGraphicsScene1();
+void Test2::run() {
+    scene = new TestGraphicsScene2();
     view = new QGraphicsView(scene);
     view->setRenderHint(QPainter::Antialiasing);
     view->setMouseTracking(true);
@@ -14,22 +14,32 @@ void Test1::run() {
     scene->setObjects();
 }
 
-TestGraphicsScene1::TestGraphicsScene1(QObject *parent) : QGraphicsScene(parent) {
+TestGraphicsScene2::TestGraphicsScene2(QObject *parent) : QGraphicsScene(parent) {
     ballSize = 50;
+    extraBallsSize = 50;
+    extraBallsNumber = 5;
+
     targetBallColor = QColor(Qt::red);
+    extraBallsColor = QColor(Qt::blue);
 
     recording = false;
     recordData.reserve(300);
 }
 
-TestGraphicsScene1::~TestGraphicsScene1() {}
+TestGraphicsScene2::~TestGraphicsScene2() {}
 
-QRect TestGraphicsScene1::getAvailableGeometry(QGraphicsScene *scene) {
+QRect TestGraphicsScene2::getAvailableGeometry(QGraphicsScene *scene) {
     QDesktopWidget dwidget;
     return dwidget.availableGeometry(scene->views()[0]);
 }
 
-void TestGraphicsScene1::setObjects() {
+QVector<QPointF> TestGraphicsScene2::transformToPoints(QVector<QGraphicsEllipseItem *> vec) {
+    QVector<QPointF> result;
+    for(QGraphicsItem * e : vec) result.push_back(e->pos());
+    return result;
+}
+
+void TestGraphicsScene2::setObjects() {
     QRect geometry = this->getAvailableGeometry(this);
 
     screenWidth = geometry.width();
@@ -45,11 +55,18 @@ void TestGraphicsScene1::setObjects() {
     targetBall->setPen(QPen(targetBallColor));
     targetBall->hide();
 
+    for(int i = 0; i < extraBallsNumber; i++) {
+        QGraphicsEllipseItem * el = this->addEllipse(0, 0, extraBallsSize, extraBallsSize);
+        el->setBrush(QBrush(extraBallsColor));
+        el->hide();
+        extraBalls.push_back(el);
+    }
+
     escText = this->addText("Press Esc to close test");
     escText->setPos(0, 0);
 }
 
-void TestGraphicsScene1::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+void TestGraphicsScene2::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     QGraphicsItem * item = this->itemAt(mouseEvent->scenePos(), QTransform());
 
     if(!item) return;
@@ -61,54 +78,67 @@ void TestGraphicsScene1::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     }
 }
 
-void TestGraphicsScene1::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+void TestGraphicsScene2::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     if(!recording) return;
     recordData.push_back(qMakePair(mouseEvent->scenePos(), time.elapsed()));
 }
 
-void TestGraphicsScene1::keyPressEvent(QKeyEvent *event) {
+void TestGraphicsScene2::keyPressEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_Escape) {
         this->views()[0]->close();
     }
 }
 
-void TestGraphicsScene1::stopRecord() {
+void TestGraphicsScene2::stopRecord() {
     recording = false;
     storeData();
     recordData.clear();
     recordData.reserve(300);
     targetBall->hide();
+    for(QGraphicsEllipseItem * e : extraBalls) e->hide();
     sButton->show();
 }
 
-void TestGraphicsScene1::storeData() {
+void TestGraphicsScene2::storeData() {
     if(!QDir("loggedData").exists()) QDir().mkdir("loggedData");
-    if(!QDir("loggedData/test_1").exists()) QDir().mkdir("loggedData/test_1");
-    QString fileName = "loggedData/test_1/%1.test";
+    if(!QDir("loggedData/test_2").exists()) QDir().mkdir("loggedData/test_2");
+    QString fileName = "loggedData/test_2/%1.test";
     int lastNumber = 1;
     while(QFile(fileName.arg(lastNumber)).exists()) lastNumber++;
     QFile file(fileName.arg(lastNumber));
+
 
     if(file.open(QIODevice::WriteOnly)) {
         QTextStream out(&file);
         serializator s(&out);
 
+
+
         s.add("test", lastNumber)
-                ->add("desc", "First test. One red ball")
+                ->add("desc", "Second test. One red ball and some blue balls")
                 ->add("ballSize", ballSize)
                 ->add("screenWidth", screenWidth)
                 ->add("screenHeight", screenHeight)
+                ->add("extraBallsSize", extraBallsSize)
+                ->add("extraBallsNumber", extraBallsNumber)
+                ->add("extraBalls", transformToPoints(extraBalls))
                 ->add("data", recordData, true)
                 ->end();
     }
     file.close();
 }
 
-void TestGraphicsScene1::startRecord() {
+void TestGraphicsScene2::startRecord() {
     recording = true;
     sButton->hide();
 
     time.start();
+
+    for(QGraphicsEllipseItem * e : extraBalls) {
+        e->setPos(ITest::getRandomNumber(0, screenWidth-extraBallsSize),
+                  ITest::getRandomNumber(0, screenHeight-extraBallsSize));
+        e->show();
+    }
 
     targetBall->setPos(ITest::getRandomNumber(0, screenWidth-ballSize),
                        ITest::getRandomNumber(0, screenHeight-ballSize));

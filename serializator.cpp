@@ -31,6 +31,19 @@ serializator * serializator::add(QString attr, QVector< QPair<QPointF, int> > &v
     return this;
 }
 
+serializator * serializator::add(QString attr, QVector<QPointF> val, bool final) {
+    *out << QString("\t\"%1\": [\n").arg(attr);
+
+    for(int i = 0; i < val.size()-1; i++) {
+        *out << QString("\t\t{ \"x\": %1, \"y\": %2 },\n").arg(val[i].x()).arg(val[i].y());
+    }
+    *out << QString("\t\t{ \"x\": %1, \"y\": %2 }\n").arg(val.last().x()).arg(val.last().y());
+
+    *out << QString("\t]%1\n").arg(final ? "" : ",");
+    return this;
+}
+
+
 void serializator::end() {
     *out << "\n}\n";
 }

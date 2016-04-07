@@ -18,13 +18,15 @@ SOURCES += main.cpp\
         base.cpp \
     test1.cpp \
     graphicsbuttons.cpp \
-    serializator.cpp
+    serializator.cpp \
+    test2.cpp
 
 HEADERS  += base.h \
     test1.h \
     ITest.h \
     tests.h \
     graphicsbuttons.h \
-    serializator.h
+    serializator.h \
+    test2.h
 
 FORMS    += base.ui
