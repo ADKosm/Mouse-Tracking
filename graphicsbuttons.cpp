@@ -28,3 +28,8 @@ void startButton::buildButton(int x, int y, int width, int height, QGraphicsScen
 bool startButton::equal(QGraphicsItem * item) {
     return (this->rect == item) || (this->text == item);
 }
+
+void startButton::remove() {
+    rect->scene()->removeItem(rect);
+    text->scene()->removeItem(text);
+}

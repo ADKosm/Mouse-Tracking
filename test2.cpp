@@ -1,15 +1,16 @@
 #include "test2.h"
 #include <QMessageBox>
 
-Test2::Test2() {}
-
-Test2::~Test2() {}
-
-void Test2::run() {
+Test2::Test2() {
     scene = new TestGraphicsScene2();
     view = new QGraphicsView(scene);
     view->setRenderHint(QPainter::Antialiasing);
     view->setMouseTracking(true);
+}
+
+Test2::~Test2() {}
+
+void Test2::run() {
     view->showFullScreen();
     scene->setObjects();
 }
@@ -85,6 +86,17 @@ void TestGraphicsScene2::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 
 void TestGraphicsScene2::keyPressEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_Escape) {
+        sButton->remove();
+        this->removeItem(targetBall);
+        this->removeItem(escText);
+        for(QGraphicsEllipseItem * e : extraBalls) this->removeItem(e);
+
+        delete sButton;
+        delete targetBall;
+        delete escText;
+        for(QGraphicsEllipseItem * e : extraBalls) delete e;
+        extraBalls.clear();
+
         this->views()[0]->close();
     }
 }

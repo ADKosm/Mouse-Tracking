@@ -15,6 +15,8 @@ public:
     void hide();
     void buildButton(int x, int y, int width, int height, QGraphicsScene * scene);
 
+    void remove();
+
     bool equal(QGraphicsItem * item);
 private:
     QGraphicsTextItem * text;
