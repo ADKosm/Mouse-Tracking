@@ -12,7 +12,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = mouseTracking
 TEMPLATE = app
-
+DESTDIR = ../Mouse-Tracking-build
 
 SOURCES += main.cpp\
         base.cpp \
