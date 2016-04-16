@@ -5,13 +5,15 @@
 
 #Build
 Установите недостающие библиотеки, если необходимо:
-  sudo apt-get install qt4-qmake libqt4-dev g++
+
+    sudo apt-get install qt4-qmake libqt4-dev g++
 
 Склонируйте этот репозиторий и соберите его:
-  git clone https://github.com/ADKosm/Mouse-Tracking.git
-  cd Mouse-Tracking/
-  qmake
-  make && make clean
+
+    git clone https://github.com/ADKosm/Mouse-Tracking.git
+    cd Mouse-Tracking/
+    qmake
+    make && make clean
 
 После этого в соседней директории Mouse-Tracking-build будет лежать готовый бинарник mouseTracking. Запустите его.
 
