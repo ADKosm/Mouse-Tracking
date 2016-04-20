@@ -105,6 +105,8 @@ void TestGraphicsScene1::storeData() {
         s.add("test", lastNumber)
                 ->add("desc", "First test. One red ball")
                 ->add("ballSize", ballSize)
+                ->add("ballX", targetBall->pos().x())
+                ->add("ballY", targetBall->pos().y())
                 ->add("screenWidth", screenWidth)
                 ->add("screenHeight", screenHeight)
                 ->add("data", recordData, true)
