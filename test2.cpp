@@ -65,6 +65,8 @@ void TestGraphicsScene2::setObjects() {
 
     escText = this->addText("Press Esc to close test");
     escText->setPos(0, 0);
+
+    time_id = QDateTime::currentDateTime();
 }
 
 void TestGraphicsScene2::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
@@ -106,15 +108,18 @@ void TestGraphicsScene2::stopRecord() {
     storeData();
     recordData.clear();
     recordData.reserve(300);
-    targetBall->hide();
-    for(QGraphicsEllipseItem * e : extraBalls) e->hide();
-    sButton->show();
+    startRecord();
+//    targetBall->hide();
+//    for(QGraphicsEllipseItem * e : extraBalls) e->hide();
+//    sButton->show();
 }
 
 void TestGraphicsScene2::storeData() {
-    if(!QDir("loggedData").exists()) QDir().mkdir("loggedData");
-    if(!QDir("loggedData/test_2").exists()) QDir().mkdir("loggedData/test_2");
-    QString fileName = "loggedData/test_2/%1.test";
+    QString path_to_folder = QString("loggedData/test_2/%1").arg(time_id.toString("ddMMhhmmss"));
+    QString fileName = QString("%1/%2.test").arg(path_to_folder);
+
+    if(!QDir(path_to_folder).exists()) QDir().mkpath(path_to_folder);
+
     int lastNumber = 1;
     while(QFile(fileName.arg(lastNumber)).exists()) lastNumber++;
     QFile file(fileName.arg(lastNumber));

@@ -25,6 +25,7 @@ private:
     QVector<QGraphicsEllipseItem *> extraBalls;
     QGraphicsTextItem * escText;
     QTime time;
+    QDateTime time_id;
 
     QVector< QPair<QPointF, int> > recordData;
 
