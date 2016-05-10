@@ -126,7 +126,10 @@ void TestGraphicsScene1::startRecord() {
 
     time.start();
 
+    ballSize = ITest::getRandomNumber(5, 200);
+
     targetBall->setPos(ITest::getRandomNumber(0, screenWidth-ballSize),
                        ITest::getRandomNumber(0, screenHeight-ballSize));
+    targetBall->setRect(0, 0, ballSize, ballSize);
     targetBall->show();
 }
