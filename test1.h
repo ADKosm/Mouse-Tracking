@@ -20,6 +20,7 @@ private:
     QGraphicsEllipseItem * targetBall;
     QGraphicsTextItem * escText;
     QTime time;
+    int shots;
     QDateTime time_id;
 
     QVector< QPair<QPointF, int> > recordData;

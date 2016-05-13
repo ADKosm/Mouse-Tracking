@@ -49,11 +49,15 @@ void TestGraphicsScene1::setObjects() {
     escText = this->addText("Press Esc to close test");
     escText->setPos(0, 0);
 
+    shots = 0;
+
     time_id = QDateTime::currentDateTime();
 }
 
 void TestGraphicsScene1::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     QGraphicsItem * item = this->itemAt(mouseEvent->scenePos(), QTransform());
+
+    shots++;
 
     if(!item) return;
 
@@ -114,6 +118,7 @@ void TestGraphicsScene1::storeData() {
                 ->add("ballY", targetBall->pos().y())
                 ->add("screenWidth", screenWidth)
                 ->add("screenHeight", screenHeight)
+                ->add("shots", shots)
                 ->add("data", recordData, true)
                 ->end();
     }
@@ -121,6 +126,8 @@ void TestGraphicsScene1::storeData() {
 }
 
 void TestGraphicsScene1::startRecord() {
+    shots = 0;
+
     recording = true;
     sButton->hide();
 
