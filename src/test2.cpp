@@ -20,14 +20,19 @@ TestGraphicsScene2::TestGraphicsScene2(QObject *parent) : QGraphicsScene(parent)
     extraBallsSize = 50;
     extraBallsNumber = 5;
 
+    minV = 2.0;
+    maxV = 6.0;
+
     targetBallColor = QColor(Qt::red);
     extraBallsColor = QColor(Qt::blue);
 
     recording = false;
     recordData.reserve(300);
+    ballData.reserve(300);
 }
 
-TestGraphicsScene2::~TestGraphicsScene2() {}
+TestGraphicsScene2::~TestGraphicsScene2() {
+}
 
 QRect TestGraphicsScene2::getAvailableGeometry(QGraphicsScene *scene) {
     QDesktopWidget dwidget;
@@ -56,17 +61,27 @@ void TestGraphicsScene2::setObjects() {
     targetBall->setPen(QPen(targetBallColor));
     targetBall->hide();
 
+    targetVelocity = ITest::getRandomVector(minV, maxV);
+
     for(int i = 0; i < extraBallsNumber; i++) {
         QGraphicsEllipseItem * el = this->addEllipse(0, 0, extraBallsSize, extraBallsSize);
         el->setBrush(QBrush(extraBallsColor));
         el->hide();
         extraBalls.push_back(el);
+        
+        QVector2D vel = ITest::getRandomVector(minV, maxV);
+
+        extraVelocities.push_back(vel);
     }
 
     escText = this->addText("Press Esc to close test");
     escText->setPos(0, 0);
 
     time_id = QDateTime::currentDateTime();
+
+    stepRunner = new QTimer(this);
+    connect(stepRunner, SIGNAL(timeout()), this, SLOT(step()));
+    stepRunner->start(20);
 }
 
 void TestGraphicsScene2::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
@@ -81,13 +96,42 @@ void TestGraphicsScene2::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     }
 }
 
+void TestGraphicsScene2::step() {
+    for(int i = 0; i < extraVelocities.size(); i++) {
+        if(extraBalls[i]->x() > screenWidth-extraBallsSize || extraBalls[i]->x() < 0 || extraBalls[i]->y() < 0 || extraBalls[i]->y() > screenHeight-extraBallsSize) {
+            extraBalls[i]->setPos(ITest::getRandomNumber(0, screenWidth-extraBallsSize),
+                      ITest::getRandomNumber(0, screenHeight-extraBallsSize));
+            extraVelocities[i] = ITest::getRandomVector(minV, maxV);
+        }
+    }
+    if(targetBall->x() > screenWidth - ballSize || targetBall->x() < 0 || targetBall->y() < 0 || targetBall->y() > screenHeight - ballSize) {
+        targetBall->setPos(ITest::getRandomNumber(0, screenWidth-ballSize),
+                  ITest::getRandomNumber(0, screenHeight-ballSize));
+        targetVelocity = ITest::getRandomVector(minV, maxV);
+        ballSize = ITest::getRandomNumber(5, 200);
+        targetBall->setRect(0, 0, ballSize, ballSize);
+
+        recordData.clear();
+        recordData.reserve(300);
+        ballData.clear();
+        ballData.reserve(300);
+    }
+
+    for(int i = 0; i < extraVelocities.size(); i++) {
+        extraBalls[i]->setPos( (extraVelocities[i]+QVector2D(extraBalls[i]->pos())).toPoint() );
+    }
+    targetBall->setPos( (targetVelocity+QVector2D(targetBall->pos())).toPoint() );
+}
+
 void TestGraphicsScene2::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     if(!recording) return;
     recordData.push_back(qMakePair(mouseEvent->scenePos(), time.elapsed()));
+    ballData.push_back(qMakePair(targetBall->pos(), time.elapsed()));
 }
 
 void TestGraphicsScene2::keyPressEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_Escape) {
+        stepRunner->stop();
         sButton->remove();
         this->removeItem(targetBall);
         this->removeItem(escText);
@@ -96,8 +140,10 @@ void TestGraphicsScene2::keyPressEvent(QKeyEvent *event) {
         delete sButton;
         delete targetBall;
         delete escText;
+        delete stepRunner;
         for(QGraphicsEllipseItem * e : extraBalls) delete e;
         extraBalls.clear();
+        extraVelocities.clear();
 
         this->views()[0]->close();
     }
@@ -108,10 +154,9 @@ void TestGraphicsScene2::stopRecord() {
     storeData();
     recordData.clear();
     recordData.reserve(300);
+    ballData.clear();
+    ballData.reserve(300);
     startRecord();
-//    targetBall->hide();
-//    for(QGraphicsEllipseItem * e : extraBalls) e->hide();
-//    sButton->show();
 }
 
 void TestGraphicsScene2::storeData() {
@@ -134,14 +179,13 @@ void TestGraphicsScene2::storeData() {
         s.add("test", lastNumber)
                 ->add("desc", "Second test. One red ball and some blue balls")
                 ->add("ballSize", ballSize)
-                ->add("ballX", targetBall->pos().x())
-                ->add("ballY", targetBall->pos().y())
                 ->add("screenWidth", screenWidth)
                 ->add("screenHeight", screenHeight)
                 ->add("extraBallsSize", extraBallsSize)
                 ->add("extraBallsNumber", extraBallsNumber)
                 ->add("extraBalls", transformToPoints(extraBalls))
-                ->add("data", recordData, true)
+                ->add("data", recordData)
+                ->add("ballData", ballData, true)
                 ->end();
     }
     file.close();
@@ -154,12 +198,14 @@ void TestGraphicsScene2::startRecord() {
     time.start();
 
     for(QGraphicsEllipseItem * e : extraBalls) {
-        e->setPos(ITest::getRandomNumber(0, screenWidth-extraBallsSize),
-                  ITest::getRandomNumber(0, screenHeight-extraBallsSize));
         e->show();
     }
 
+    ballSize = ITest::getRandomNumber(5, 200);
+
     targetBall->setPos(ITest::getRandomNumber(0, screenWidth-ballSize),
                        ITest::getRandomNumber(0, screenHeight-ballSize));
+    targetVelocity = ITest::getRandomVector(minV, maxV);
+    targetBall->setRect(0, 0, ballSize, ballSize);
     targetBall->show();
 }

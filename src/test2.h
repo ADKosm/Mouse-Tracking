@@ -20,14 +20,22 @@ private:
     QColor extraBallsColor;
     bool recording;
 
+    float minV;
+    float maxV;
+
     startButton * sButton;
     QGraphicsEllipseItem * targetBall;
     QVector<QGraphicsEllipseItem *> extraBalls;
+    QVector<QVector2D> extraVelocities;
+    QVector2D targetVelocity;
     QGraphicsTextItem * escText;
     QTime time;
     QDateTime time_id;
 
+    QTimer* stepRunner;
+
     QVector< QPair<QPointF, int> > recordData;
+    QVector< QPair<QPointF, int> > ballData;
 
     void startRecord();
     void stopRecord();
@@ -35,10 +43,13 @@ private:
 
     QRect getAvailableGeometry(QGraphicsScene * scene);
     QVector<QPointF> transformToPoints(QVector<QGraphicsEllipseItem *> vec);
+
 private slots:
     void mousePressEvent(QGraphicsSceneMouseEvent * mouseEvent);
     void mouseMoveEvent(QGraphicsSceneMouseEvent * mouseEvent);
     void keyPressEvent(QKeyEvent *event);
+
+    void step();
 };
 
 class Test2: public ITest {
