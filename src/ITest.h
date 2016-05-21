@@ -18,6 +18,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QKeyEvent>
+#include <QVector2D>
 
 class ITest {
 public:
