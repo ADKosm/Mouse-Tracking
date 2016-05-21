@@ -179,6 +179,8 @@ void TestGraphicsScene2::storeData() {
         s.add("test", lastNumber)
                 ->add("desc", "Second test. One red ball and some blue balls")
                 ->add("ballSize", ballSize)
+                ->add("ballX", targetBall->pos().x())
+                ->add("ballY", targetBall->pos().y())
                 ->add("screenWidth", screenWidth)
                 ->add("screenHeight", screenHeight)
                 ->add("extraBallsSize", extraBallsSize)
