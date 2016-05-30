@@ -16,15 +16,19 @@ private:
     int ballSize;
     int extraBallsSize;
     int extraBallsNumber;
+    int currentGreen;
+    int greenBallSize;
     QColor targetBallColor;
     QColor extraBallsColor;
     bool recording;
+    bool greening;
 
     float minV;
     float maxV;
 
     startButton * sButton;
     QGraphicsEllipseItem * targetBall;
+    QGraphicsEllipseItem * greenBall;
     QVector<QGraphicsEllipseItem *> extraBalls;
     QVector<QVector2D> extraVelocities;
     QVector2D targetVelocity;

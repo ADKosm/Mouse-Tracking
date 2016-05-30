@@ -19,6 +19,7 @@ TestGraphicsScene2::TestGraphicsScene2(QObject *parent) : QGraphicsScene(parent)
     ballSize = 50;
     extraBallsSize = 50;
     extraBallsNumber = 5;
+    greenBallSize = 100;
 
     minV = 2.0;
     maxV = 6.0;
@@ -27,6 +28,8 @@ TestGraphicsScene2::TestGraphicsScene2(QObject *parent) : QGraphicsScene(parent)
     extraBallsColor = QColor(Qt::blue);
 
     recording = false;
+    greening = false;
+    currentGreen = 0;
     recordData.reserve(300);
     ballData.reserve(300);
 }
@@ -66,6 +69,7 @@ void TestGraphicsScene2::setObjects() {
     for(int i = 0; i < extraBallsNumber; i++) {
         QGraphicsEllipseItem * el = this->addEllipse(0, 0, extraBallsSize, extraBallsSize);
         el->setBrush(QBrush(extraBallsColor));
+        el->setPen(QPen(extraBallsColor));
         el->hide();
         extraBalls.push_back(el);
         
@@ -73,6 +77,11 @@ void TestGraphicsScene2::setObjects() {
 
         extraVelocities.push_back(vel);
     }
+
+    greenBall = this->addEllipse(0, 0, greenBallSize, greenBallSize);
+    greenBall->setBrush(QBrush(Qt::green));
+    greenBall->setPen(QPen(Qt::green));
+    greenBall->hide();
 
     escText = this->addText("Press Esc to close test");
     escText->setPos(0, 0);
@@ -92,7 +101,9 @@ void TestGraphicsScene2::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     if(sButton->equal(item)) {
         startRecord();
     }else if(item == targetBall) {
-        if(recording) stopRecord();
+        if(recording) {
+            stopRecord();
+        }
     }
 }
 
@@ -124,6 +135,22 @@ void TestGraphicsScene2::step() {
 }
 
 void TestGraphicsScene2::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+    if(greening) {
+        QGraphicsItem * item = this->itemAt(mouseEvent->scenePos(), QTransform());
+        if(!item) return;
+
+        if(item == greenBall) {
+            currentGreen--;
+            if(currentGreen == 0) {
+                greenBall->hide();
+                greening = false;
+                startRecord();
+            } else {
+                greenBall->setPos(ITest::getRandomNumber(0, screenWidth-greenBallSize),
+                                  ITest::getRandomNumber(0, screenHeight-greenBallSize));
+            }
+        }
+    }
     if(!recording) return;
     recordData.push_back(qMakePair(mouseEvent->scenePos(), time.elapsed()));
     ballData.push_back(qMakePair(targetBall->pos(), time.elapsed()));
@@ -135,6 +162,7 @@ void TestGraphicsScene2::keyPressEvent(QKeyEvent *event) {
         sButton->remove();
         this->removeItem(targetBall);
         this->removeItem(escText);
+        this->removeItem(greenBall);
         for(QGraphicsEllipseItem * e : extraBalls) this->removeItem(e);
 
         delete sButton;
@@ -142,8 +170,11 @@ void TestGraphicsScene2::keyPressEvent(QKeyEvent *event) {
         delete escText;
         delete stepRunner;
         for(QGraphicsEllipseItem * e : extraBalls) delete e;
+        delete greenBall;
         extraBalls.clear();
         extraVelocities.clear();
+
+        greening = 0;
 
         this->views()[0]->close();
     }
@@ -151,12 +182,20 @@ void TestGraphicsScene2::keyPressEvent(QKeyEvent *event) {
 
 void TestGraphicsScene2::stopRecord() {
     recording = false;
+    greening = true;
     storeData();
     recordData.clear();
     recordData.reserve(300);
     ballData.clear();
     ballData.reserve(300);
-    startRecord();
+
+    currentGreen = ITest::getRandomNumber(1, 3);
+    greenBall->setPos(ITest::getRandomNumber(0, screenWidth-greenBallSize),
+                      ITest::getRandomNumber(0, screenHeight-greenBallSize));
+    greenBall->show();
+
+    targetBall->hide();
+//    startRecord();
 }
 
 void TestGraphicsScene2::storeData() {
